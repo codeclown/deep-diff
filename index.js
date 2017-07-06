@@ -1,67 +1,88 @@
-import R from 'ramda'
+import {
+  __,
+  addIndex,
+  append,
+  complement,
+  compose,
+  cond,
+  contains,
+  equals,
+  evolve,
+  flatten,
+  isNil,
+  keys,
+  map,
+  nthArg,
+  path as pathDeep,
+  pipe,
+  prop,
+  props,
+  reject,
+  type
+} from 'ramda'
 
-const mapWithIndex = R.addIndex(R.map)
+const mapWithIndex = addIndex(map)
 const bothEqual = ([a, b]) => a === b
-const toTypeObject = value => ({ type: R.type(value) })
+const toTypeObject = value => ({ type: type(value) })
 const toValueObject = value => ({ value })
-const rejectNil = R.reject(R.isNil)
+const rejectNil = reject(isNil)
 
-const typesDiffer = R.pipe(
-  R.props(['expected', 'actual']),
-  R.map(R.type),
-  R.complement(bothEqual)
+const typesDiffer = pipe(
+  props(['expected', 'actual']),
+  map(type),
+  complement(bothEqual)
 )
 
-const evolveToTypeObjects = R.evolve({
+const evolveToTypeObjects = evolve({
   expected: toTypeObject,
   actual: toTypeObject
 })
 
-const isArray = R.pipe(
-  R.prop('actual'),
-  R.type,
-  R.equals('Array')
+const isArray = pipe(
+  prop('actual'),
+  type,
+  equals('Array')
 )
 
-const processArray = recursive => ({ actual, path }) => mapWithIndex(R.pipe(
-  R.nthArg(1),
-  R.append(R.__, path),
+const processArray = recursive => ({ actual, path }) => mapWithIndex(pipe(
+  nthArg(1),
+  append(__, path),
   recursive
 ), actual)
 
-const isObject = R.pipe(
-  R.prop('actual'),
-  R.type,
-  R.equals('Object')
+const isObject = pipe(
+  prop('actual'),
+  type,
+  equals('Object')
 )
 
-const processObject = (recursive, ignore) => R.pipe(
-  R.evolve({
-    actual: R.pipe(
-      R.keys,
-      R.reject(R.contains(R.__, ignore))
+const processObject = (recursive, ignore) => pipe(
+  evolve({
+    actual: pipe(
+      keys,
+      reject(contains(__, ignore))
     )
   }),
-  ({ actual, path }) => R.map(R.pipe(
-    R.append(R.__, path),
+  ({ actual, path }) => map(pipe(
+    append(__, path),
     recursive
   ), actual)
 )
 
-const valuesDontEqual = R.pipe(
-  R.props(['expected', 'actual']),
-  R.complement(bothEqual)
+const valuesDontEqual = pipe(
+  props(['expected', 'actual']),
+  complement(bothEqual)
 )
 
-const evolveToValueObjects = R.evolve({
+const evolveToValueObjects = evolve({
   expected: toValueObject,
   actual: toValueObject
 })
 
 export default (actual, expected, options = { ignore: [] }) => {
-  const recursive = path => R.compose(
+  const recursive = path => compose(
     ensureArray,
-    R.cond(conditions),
+    cond(conditions),
     extractFromPath
   )(path)
 
@@ -76,15 +97,15 @@ export default (actual, expected, options = { ignore: [] }) => {
 
   const extractFromPath = path => ({
     path,
-    expected: R.path(path, expected),
-    actual: R.path(path, actual)
+    expected: pathDeep(path, expected),
+    actual: pathDeep(path, actual)
   })
 
   const initialPath = []
 
-  return R.compose(
+  return compose(
     rejectNil,
-    R.flatten,
+    flatten,
     recursive
   )(initialPath)
 }
