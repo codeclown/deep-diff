@@ -59,7 +59,7 @@ test('deepDiff', t => {
       expected: { value: 'first' },
       actual: { value: 'second' }
     }
-  ], deepDiff('first', 'second'))
+  ], deepDiff('second', 'first'))
 
   t.deepEqual([], deepDiff('nice', 'nice'))
 

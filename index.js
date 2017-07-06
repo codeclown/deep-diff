@@ -60,9 +60,12 @@ const evolveToValueObjects = R.evolve({
 
 export default (actual, expected, options = { ignore: [] }) => {
   const recursive = path => R.compose(
+    ensureArray,
     R.cond(conditions),
     extractFromPath
   )(path)
+
+  const ensureArray = thing => ([thing])
 
   const conditions = [
     [typesDiffer, evolveToTypeObjects],

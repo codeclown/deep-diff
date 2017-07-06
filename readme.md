@@ -7,14 +7,14 @@ Needed for personal project. At this time is not suitable for general production
 
 ## Signature
 
-```
+```js
 deepDiff(actual, expected, [options])
 ```
 
 
 ## Usage
 
-```
+```js
 const expected = {
   foo: 'test',
   items: ['maybe', 'yes'],
@@ -32,7 +32,7 @@ const differences = deepDiff(actual, expected)
 
 Differences would return:
 
-```
+```js
 {
   path: ['foo'],
   expected: { value: 'test' },
@@ -55,7 +55,7 @@ Differences would return:
 
 Use `options.ignore` to ignore diffing specific keys:
 
-```
+```js
 const expected = {
   foo: 'test',
   items: ['maybe', 'yes']
@@ -71,7 +71,7 @@ const differences = deepDiff(actual, expected, { ignore: ['items'] })
 
 Differences would return:
 
-```
+```js
 {
   path: ['foo'],
   expected: { value: 'test' },
